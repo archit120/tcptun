@@ -33,6 +33,20 @@ func StartServer(port int) {
 			log.Fatal(err)
 		}
 
+		go func() {
+			buf := make([]byte, 1500)
+			for {
+				n, err := ifce.Read(buf)
+				if err != nil {
+					break
+				}
+				n, err = conn.Write(buf[:n])
+				if err != nil {
+					break
+				}
+			}
+		}()
+
 		buf := make([]byte, 1500)
 		for {
 			n, err := conn.Read(buf)
@@ -50,5 +64,7 @@ func StartServer(port int) {
 		}
 		conn.Close()
 	}
+
+
 
 }

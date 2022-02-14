@@ -27,9 +27,21 @@ func StartClient(serverIP string) {
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
 
+	go func() {
+		buf := make([]byte, 1500)
+		for {
+			n, err := conn.Read(buf)
+			if err != nil {
+				break
+			}
+			n, err = ifce.Write(buf[:n])
+			if err != nil {
+				break
+			}
+		}
+	}()
+
 	packet := make([]byte, 2000)
-	var packet2 [4]byte
-	packet2[0] = 1
 	for {
 		n, err := ifce.Read(packet)
 		log.Printf("Received packet of size %d sending to conn.\n", n)
