@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  server:
+    build: .
+    volumes:
+      - .:/code
+      - gocacheserver:/go
+    command: go run main.go server -l 443
+  testclient:
+    build: .
+    volumes:
+      - .:/code
+      - gocacheclient:/go
+    command: go run main.go client -s server:443
+
+volumes:
+  gocacheclient:
+  gocacheserver:

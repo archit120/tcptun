@@ -1,0 +1,59 @@
+{
+    "version": "2.0.0",
+    "presentation": {
+      "echo": false,
+      "reveal": "always",
+      "focus": false,
+      "panel": "dedicated",
+      "showReuseMessage": true
+    },
+    "tasks": [
+      {
+        "label": "Run All",
+        "dependsOn": [
+          "docker-compose-up",
+          "client bash",
+          "server bash"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+        // ,
+        // "runOptions": {
+        //   "runOn": "folderOpen"
+        // }
+      },
+      {
+        "label": "docker-compose-up",
+        "type": "shell",
+        "command": "docker-compose up",
+        "isBackground": true,
+        "problemMatcher": [],
+        "presentation": {
+          "group": "my-group"
+        }
+      },
+      {
+        "label": "server bash",
+        "type": "shell",
+        "command": "docker-compose exec server bash",
+        "isBackground": true,
+        "problemMatcher": [],
+        "presentation": {
+          "group": "my-group"
+        }
+      },
+      {
+        "label": "client bash",
+        "type": "shell",
+        "command": "docker-compose exec testclient bash",
+        "isBackground": true,
+        "problemMatcher": [],
+        "presentation": {
+          "group": "my-group"
+        }
+      }
+    ]
+  }
+  
