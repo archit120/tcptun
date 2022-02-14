@@ -1,10 +1,11 @@
 package client
 
 import (
-	"log"
 	"net"
 
+	"github.com/sirupsen/logrus"
 	"github.com/songgao/water"
+	"github.com/archit120/tcptun/common"
 )
 
 func StartClient(serverIP string) {
@@ -13,7 +14,7 @@ func StartClient(serverIP string) {
 	}
 	ifce, err := water.New(config)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	defer ifce.Close()
@@ -21,7 +22,7 @@ func StartClient(serverIP string) {
 
 	conn, err := net.Dial("tcp", serverIP)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	defer conn.Close()
@@ -30,12 +31,16 @@ func StartClient(serverIP string) {
 	go func() {
 		buf := make([]byte, 1500)
 		for {
-			n, err := conn.Read(buf)
+			n, err := common.ReadPackedPacket(conn, buf)
 			if err != nil {
+				logrus.Error("Error in client connection read")
+				logrus.Error(err)
 				break
 			}
 			n, err = ifce.Write(buf[:n])
 			if err != nil {
+				logrus.Error("Error in client interface write")
+				logrus.Error(err)
 				break
 			}
 		}
@@ -44,11 +49,11 @@ func StartClient(serverIP string) {
 	packet := make([]byte, 2000)
 	for {
 		n, err := ifce.Read(packet)
-		log.Printf("Received packet of size %d sending to conn.\n", n)
+		logrus.Debug("Received packet of size %d sending to conn.\n", n)
 		if err != nil {
-			log.Fatal(err)
+			logrus.Fatal(err)
 		}
-		conn.Write(packet[:n])
+		common.WritePackedPacket(conn, packet[:n])
 	}
 
 }

@@ -2,17 +2,19 @@ package server
 
 import (
 	"io"
-	"log"
 	"net"
 	"strconv"
 
+	"github.com/sirupsen/logrus"
 	"github.com/songgao/water"
+	"github.com/archit120/tcptun/common"
+
 )
 
 func StartServer(port int) {
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	defer listener.Close()
@@ -22,7 +24,7 @@ func StartServer(port int) {
 	}
 	ifce, err := water.New(config)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	defer ifce.Close()
@@ -30,7 +32,7 @@ func StartServer(port int) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal(err)
+			logrus.Fatal(err)
 		}
 
 		go func() {
@@ -38,10 +40,13 @@ func StartServer(port int) {
 			for {
 				n, err := ifce.Read(buf)
 				if err != nil {
+					logrus.Error("Error in server interface read")
 					break
 				}
-				n, err = conn.Write(buf[:n])
+				n, err = common.WritePackedPacket(conn, buf[:n])
 				if err != nil {
+					logrus.Error("Error in server connection write")
+
 					break
 				}
 			}
@@ -49,17 +54,15 @@ func StartServer(port int) {
 
 		buf := make([]byte, 1500)
 		for {
-			n, err := conn.Read(buf)
+			n, err := common.ReadPackedPacket(conn, buf)
 			if err != nil {
 				if err != io.EOF {
-					log.Println(err)
+					logrus.Error(err)
 				}
 				break
 			}
-			receivedPacket := buf[:n]
-			log.Printf("%x\n", receivedPacket)
-			log.Printf("Recieved packet of %d from client\n", n)
-			log.Printf("Dumping on this interface\n")
+			logrus.Debug("Recieved packet of %d from client\n", n)
+			logrus.Debug("Dumping on this interface\n")
 			ifce.Write(buf[:n])
 		}
 		conn.Close()
