@@ -1,28 +1,31 @@
 package main
 
 import (
+	"flag"
 	"log"
 
-	"github.com/songgao/water"
+	"github.com/archit120/tcptun/client"
+	"github.com/archit120/tcptun/server"
 )
 
 func main() {
-	config := water.Config{
-		DeviceType: water.TUN,
-	}
-	// config.Name = "O_O"
 
-	ifce, err := water.New(config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	packet := make([]byte, 2000)
+	isClient := flag.Bool("client", false, "Start as a vpn client")
+	isServer := flag.Bool("server", false, "Start as a vpn server")
+	port := flag.Int("l", 443, "Server listening port")
+	serverip := flag.String("s", "", "Server listening port")
 
-	for {
-		n, err := ifce.Read(packet)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("Dst: %x\n", packet[:n])
+	flag.Parse()
+
+	if *isClient && *isServer {
+		log.Fatal("Both client and server options specified")
+	} else if !(*isClient || *isServer) {
+		log.Fatal("Neither client not server option specified")
+	} else if *isClient {
+		log.Printf("Starting as client\n")
+		client.StartClient(*serverip)
+	} else {
+		log.Printf("Starting as server\n")
+		server.StartServer(*port)
 	}
 }

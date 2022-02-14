@@ -1,22 +1,23 @@
 version: '3.9'
 services:
   server:
-    build: .
+    build: server
     volumes:
       - .:/code
       - gocacheserver:/go
-    command: go run main.go server -l 443
+    command: go run main.go -server -l 443
     cap_add:
       - NET_ADMIN
+      - NET_RAW
     devices:
       - /dev/net/tun
 
   testclient:
-    build: .
+    build: client
     volumes:
       - .:/code
       - gocacheclient:/go
-    command: go run main.go client -s server:443
+    command: go run main.go -client -s server:443
     cap_add:
       - NET_ADMIN
     devices:
