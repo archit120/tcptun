@@ -6,12 +6,21 @@ services:
       - .:/code
       - gocacheserver:/go
     command: go run main.go server -l 443
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+
   testclient:
     build: .
     volumes:
       - .:/code
       - gocacheclient:/go
     command: go run main.go client -s server:443
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
 
 volumes:
   gocacheclient:
