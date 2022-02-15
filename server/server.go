@@ -29,7 +29,7 @@ func StartServer(port int) {
 	}
 	logrus.Info("Interface name is " +ifce.Name())
 	logrus.Info("Running config script")
-	cmd, err := exec.Command("/bin/sh", "./scripts/server.sh", "192.168.200.1/24", ifce.Name()).Output()
+	cmd, err := exec.Command("/bin/sh", "./scripts/server.sh", "192.168.100.1/24", ifce.Name()).Output()
 	if err != nil {
 		logrus.Fatal(err)
 	}
