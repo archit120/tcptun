@@ -46,7 +46,6 @@ func StartServer(port int) {
 	
 		go func() {
 			buf := make([]byte, 1500)
-			// writer := io.Writer(conn)
 
 			for {
 				n, err := ifce.Read(buf)

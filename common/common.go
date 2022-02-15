@@ -36,5 +36,6 @@ func WritePackedPacket(writer *bufio.Writer, buffer []byte) (int, error) {
 	} else if n != len(buffer) {
 		return 0, errors.New("Didnt send enough bytes")
 	}
+	err = writer.Flush()
 	return n, err
 }
