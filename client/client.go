@@ -16,7 +16,7 @@ import (
 
 func StartClient(serverIP string) {
 	config := water.Config{
-		DeviceType: water.TUN,
+		DeviceType: water.TAP,
 	}
 	ifce, err := water.New(config)
 	if err != nil {
@@ -43,7 +43,7 @@ func StartClient(serverIP string) {
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
 	logrus.Info("Running config script")
-	cmd, err := exec.Command("/bin/sh", "./scripts/client.sh", "192.168.200.2/24", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+	cmd, err := exec.Command("/bin/sh", "./scripts/client.sh", "192.168.200.2/24", ifce.Name(), strings.Split(serverIP, ":")[0], "192.168.200.1").Output()
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func StartClient(serverIP string) {
 		conn.Close()
 	}()
 
-	packet := make([]byte, 2000)
+	packet := make([]byte, 1500)
 	for {
 		n, err := ifce.Read(packet)
 		logrus.Debug("Received packet of size %d sending to conn.\n", n)

@@ -21,7 +21,7 @@ func StartServer(port int) {
 	defer listener.Close()
 
 	config := water.Config{
-		DeviceType: water.TUN,
+		DeviceType: water.TAP,
 	}
 	ifce, err := water.New(config)
 	if err != nil {
