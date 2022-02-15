@@ -11,5 +11,18 @@ services:
       - NET_RAW
     devices:
       - /dev/net/tun
+
+  testclient:
+    build: client
+    volumes:
+      - .:/code
+      - gocacheclient:/go
+    command: go run main.go -client -s server:443
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+
 volumes:
+  gocacheclient:
   gocacheserver:

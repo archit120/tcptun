@@ -27,7 +27,7 @@
       {
         "label": "docker-compose-up",
         "type": "shell",
-        "command": "docker-compose up",
+        "command": "docker-compose -f docker-compose.dev.yml up",
         "isBackground": true,
         "problemMatcher": [],
         "presentation": {
