@@ -42,13 +42,13 @@ func StartClient(serverIP string) {
 
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
-	logrus.Info("Running config script")
-	cmd, err := exec.Command("/bin/sh", "./scripts/client.sh", "192.168.200.2/24", ifce.Name(), strings.Split(serverIP, ":")[0], "192.168.200.1").Output()
+	logrus.Info("Running config script", ifce.Name())
+	cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name()).Output()
 	if err != nil {
+		logrus.Info(string(cmd))
 		logrus.Fatal(err)
 	}
-	logrus.Info(cmd)
-
+	logrus.Info("Script 1 done")
     reader := bufio.NewReader(conn)
     writer := bufio.NewWriter(conn)
 
@@ -71,6 +71,15 @@ func StartClient(serverIP string) {
 			}
 		}
 		conn.Close()
+	}()
+	
+	go func() {
+		cmd, err:= exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+		if err != nil {
+			logrus.Info(string(cmd))
+			logrus.Fatal(err)
+		}
+		logrus.Info("Script 2 done")
 	}()
 
 	packet := make([]byte, 1500)
