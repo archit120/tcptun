@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# ${gateway IP} ${device name} ${server ip}
+# ${gateway IP} ${device name}
 ip addr add $1 dev $2
 ip link set dev $2 mtu 1400
 ip link set dev $2 up

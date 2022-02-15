@@ -23,5 +23,4 @@ ip link set dev tun0 up
 sysctl -w net.ipv4.ip_forward=1
 update-alternatives --set iptables /usr/sbin/iptables-legacy
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-
 ```
