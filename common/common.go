@@ -11,17 +11,13 @@ import (
 
 func ReadPackedPacket(reader io.Reader, buffer []byte) (int, error) {
 	n, err := io.ReadAtLeast(reader, buffer, 2)
-	if err!= nil {
+	if err!= nil && err!=io.EOF {
 		return 0, err
-	} else if n != 2 {
-		return 0, errors.New("Didnt return enough bytes")
 	}
 	size := binary.BigEndian.Uint16(buffer[:2])
 	n, err = io.ReadAtLeast(reader, buffer, int(size))
-	if err!= nil {
+	if err!= nil && err!=io.EOF{
 		return 0, err
-	} else if n != int(size) {
-		return 0, errors.New("Didnt return enough bytes")
 	}
 	return n, err
 }
@@ -40,7 +36,7 @@ func WritePackedPacket(conn net.Conn, buffer []byte) (int, error) {
 	if err!= nil {
 		return 0, err
 	} else if n != len(buffer) {
-		return 0, errors.New("Didnt return enough bytes")
+		return 0, errors.New("Didnt send enough bytes")
 	}
 	return n, err
 }

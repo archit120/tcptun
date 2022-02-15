@@ -43,6 +43,8 @@ func StartServer(port int) {
 
 		go func() {
 			buf := make([]byte, 1500)
+			// writer := io.Writer(conn)
+
 			for {
 				n, err := ifce.Read(buf)
 				if err != nil {
@@ -60,7 +62,6 @@ func StartServer(port int) {
 
 		buf := make([]byte, 1500)
 		reader := io.Reader(conn)
-
 		for {
 			n, err := common.ReadPackedPacket(reader, buf)
 			if err != nil {
