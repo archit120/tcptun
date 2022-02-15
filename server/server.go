@@ -60,6 +60,8 @@ func StartServer(port int) {
 					break
 				}
 			}
+
+			conn.Close()
 		}()
 
 		buf := make([]byte, 1500)

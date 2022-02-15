@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
+
+	"github.com/sirupsen/logrus"
 )
 
 func ReadPackedPacket(reader *bufio.Reader, buffer []byte) (int, error) {
@@ -13,6 +15,7 @@ func ReadPackedPacket(reader *bufio.Reader, buffer []byte) (int, error) {
 		return 0, err
 	}
 	size := binary.BigEndian.Uint16(buffer[:2])
+	logrus.Debug(size)
 	n, err = io.ReadAtLeast(reader, buffer, int(size))
 	if err!= nil{
 		return 0, err

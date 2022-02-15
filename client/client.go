@@ -56,6 +56,7 @@ func StartClient(serverIP string) {
 				break
 			}
 		}
+		conn.Close()
 	}()
 
 	packet := make([]byte, 2000)
