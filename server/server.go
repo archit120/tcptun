@@ -26,7 +26,7 @@ func StartServer(port int) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
+	logrus.Info("Interface name is " +ifce.Name())
 	defer ifce.Close()
 
 	for {
