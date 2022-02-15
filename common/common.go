@@ -16,7 +16,7 @@ func ReadPackedPacket(reader *bufio.Reader, buffer []byte) (int, error) {
 	}
 	size := binary.BigEndian.Uint16(buffer[:2])
 	logrus.Debug(size)
-	n, err = io.ReadAtLeast(reader, buffer, int(size))
+	n, err = io.ReadFull(reader, buffer[:int(size)])
 	if err!= nil{
 		return 0, err
 	}

@@ -3,8 +3,11 @@ package client
 import (
 	"bufio"
 	"net"
+	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/archit120/tcptun/common"
 	"github.com/sirupsen/logrus"
@@ -19,6 +22,15 @@ func StartClient(serverIP string) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+
+	c := make(chan os.Signal)
+    signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+    go func() {
+        <-c
+        exec.Command("/bin/sh", "./scripts/client_cleanup.sh", strings.Split(serverIP, ":")[0]).Output()
+        os.Exit(0)
+    }()
+
 
 	defer ifce.Close()
 	// Create TCP connection to server
@@ -44,11 +56,13 @@ func StartClient(serverIP string) {
 		buf := make([]byte, 1500)
 		for {
 			n, err := common.ReadPackedPacket(reader, buf)
+			
 			if err != nil {
 				logrus.Error("Error in client connection read")
 				logrus.Error(err)
 				break
 			}
+			logrus.Debug("Received packet from server of size ", n)
 			n, err = ifce.Write(buf[:n])
 			if err != nil {
 				logrus.Error("Error in client interface write")
