@@ -51,12 +51,13 @@ func StartServer(port int) {
 				n, err := ifce.Read(buf)
 				if err != nil {
 					logrus.Error("Error in server interface read")
+					logrus.Error(err)
 					break
 				}
 				n, err = common.WritePackedPacket(writer, buf[:n])
 				if err != nil {
 					logrus.Error("Error in server connection write")
-
+					logrus.Error(err)
 					break
 				}
 			}
