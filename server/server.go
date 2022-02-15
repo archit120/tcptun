@@ -28,7 +28,7 @@ func StartServer(port int) {
 	}
 	logrus.Info("Interface name is " +ifce.Name())
 	logrus.Info("Running config script")
-	cmd, err := exec.Command("/bin/sh", "./scripts/server.sh", "192.168.0.1/24", ifce.Name()).Output()
+	cmd, err := exec.Command("/bin/sh", "./scripts/server.sh", "192.168.200.1/24", ifce.Name()).Output()
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -59,8 +59,10 @@ func StartServer(port int) {
 		}()
 
 		buf := make([]byte, 1500)
+		reader := io.Reader(conn)
+
 		for {
-			n, err := common.ReadPackedPacket(conn, buf)
+			n, err := common.ReadPackedPacket(reader, buf)
 			if err != nil {
 				if err != io.EOF {
 					logrus.Error(err)

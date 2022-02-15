@@ -1,11 +1,14 @@
 package client
 
 import (
+	"io"
 	"net"
+	"os/exec"
+	"strings"
 
+	"github.com/archit120/tcptun/common"
 	"github.com/sirupsen/logrus"
 	"github.com/songgao/water"
-	"github.com/archit120/tcptun/common"
 )
 
 func StartClient(serverIP string) {
@@ -27,11 +30,19 @@ func StartClient(serverIP string) {
 
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
+	logrus.Info("Running config script")
+	cmd, err := exec.Command("/bin/sh", "./scripts/client.sh", "192.168.200.2/24", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	logrus.Info(cmd)
+
+	reader := io.Reader(conn)
 
 	go func() {
 		buf := make([]byte, 1500)
 		for {
-			n, err := common.ReadPackedPacket(conn, buf)
+			n, err := common.ReadPackedPacket(reader, buf)
 			if err != nil {
 				logrus.Error("Error in client connection read")
 				logrus.Error(err)
