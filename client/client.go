@@ -1,7 +1,7 @@
 package client
 
 import (
-	"io"
+	"bufio"
 	"net"
 	"os/exec"
 	"strings"
@@ -37,7 +37,8 @@ func StartClient(serverIP string) {
 	}
 	logrus.Info(cmd)
 
-	reader := io.Reader(conn)
+    reader := bufio.NewReader(conn)
+    writer := bufio.NewWriter(conn)
 
 	go func() {
 		buf := make([]byte, 1500)
@@ -64,7 +65,7 @@ func StartClient(serverIP string) {
 		if err != nil {
 			logrus.Fatal(err)
 		}
-		common.WritePackedPacket(conn, packet[:n])
+		common.WritePackedPacket(writer, packet[:n])
 	}
 
 }

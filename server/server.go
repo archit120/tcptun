@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bufio"
 	"io"
 	"net"
 	"os/exec"
@@ -40,7 +41,9 @@ func StartServer(port int) {
 		if err != nil {
 			logrus.Fatal(err)
 		}
-
+		reader := bufio.NewReader(conn)
+		writer := bufio.NewWriter(conn)
+	
 		go func() {
 			buf := make([]byte, 1500)
 			// writer := io.Writer(conn)
@@ -51,7 +54,7 @@ func StartServer(port int) {
 					logrus.Error("Error in server interface read")
 					break
 				}
-				n, err = common.WritePackedPacket(conn, buf[:n])
+				n, err = common.WritePackedPacket(writer, buf[:n])
 				if err != nil {
 					logrus.Error("Error in server connection write")
 
@@ -61,7 +64,6 @@ func StartServer(port int) {
 		}()
 
 		buf := make([]byte, 1500)
-		reader := io.Reader(conn)
 		for {
 			n, err := common.ReadPackedPacket(reader, buf)
 			if err != nil {
