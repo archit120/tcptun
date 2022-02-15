@@ -17,7 +17,7 @@ ip route add ${IP}/32 dev eth0
 Commands to run on server are -
 
 ```
-ip addr add 10.1.0.1/24 dev tun0
+ip addr add 192.168.0.1/24 dev tun0
 ip link set dev tun0 mtu 1400
 ip link set dev tun0 up
 sysctl -w net.ipv4.ip_forward=1
