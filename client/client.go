@@ -23,13 +23,6 @@ func StartClient(serverIP string) {
 		logrus.Fatal(err)
 	}
 
-	c := make(chan os.Signal)
-    signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-    go func() {
-        <-c
-        exec.Command("/bin/sh", "./scripts/client_cleanup.sh", strings.Split(serverIP, ":")[0]).Output()
-        os.Exit(0)
-    }()
 
 
 	defer ifce.Close()
@@ -39,6 +32,14 @@ func StartClient(serverIP string) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+	c := make(chan os.Signal)
+    signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+    go func() {
+        <-c
+        exec.Command("./scripts/client_cleanup.sh", strings.Split(serverIP, ":")[0], ifce.Name()).Output()
+        conn.Close() // this will casue main to end aswell
+		ifce.Close()
+    }()
 
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes

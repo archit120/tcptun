@@ -8,3 +8,4 @@ sysctl -w net.ipv4.ip_forward=1
 update-alternatives --set iptables /usr/sbin/iptables-legacy
 DEV=$(ip route | awk '/default/ {print $5; exit}')
 iptables -t nat -A POSTROUTING -o ${DEV} -j MASQUERADE
+systemctl restart isc-dhcp-server.service
