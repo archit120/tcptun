@@ -10,3 +10,4 @@ else
     GW=$(getent hosts $1 | awk 'NR==1{ print $1 }')
 fi
 ip route add $GW/32 via ${IP} dev ${DEV}
+sleep 1

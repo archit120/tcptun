@@ -57,16 +57,6 @@ func StartClient(serverIP string) {
 
 	defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
-	if runtime.GOOS != "windows" {
-		logrus.Info("Running config script", ifce.Name())
-		cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
-		if err != nil {
-			logrus.Info(string(cmd))
-			cleanup()
-			logrus.Fatal(err)
-		}
-	}
-	logrus.Info("Script 1 done")
 	reader := bufio.NewReader(conn)
 	writer := io.Writer(conn)
 
@@ -94,6 +84,17 @@ func StartClient(serverIP string) {
 	go func() {
 		var err error
 		var cmd []byte
+		if runtime.GOOS != "windows" {
+			logrus.Info("Running config script", ifce.Name())
+			cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+			if err != nil {
+				logrus.Info(string(cmd))
+				cleanup()
+				logrus.Fatal(err)
+			}
+		}
+		logrus.Info("Script 1 done")
+	
 		if runtime.GOOS != "windows" {
 			cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
 		} else {

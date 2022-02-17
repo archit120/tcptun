@@ -2,6 +2,7 @@
 
 # ${client IP} ${device name} ${server ip} ${server gateway}
 sleep 1
+
 dhclient $1 -v
 L1=$(ip r | grep $1 | awk '{print $1; exit}')
 IFS='/' read -r -a array <<< "${L1}"
