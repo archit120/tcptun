@@ -35,38 +35,40 @@ func StartServer(port int) {
 	}
 	logrus.Info(cmd)
 	defer ifce.Close()
+	var conn net.Conn
+	var writer *bufio.Writer
+	go func() {
+		buf := make([]byte, 1500)
+
+		for {
+			n, err := ifce.Read(buf)
+			if err != nil {
+				logrus.Error("Error in server interface read")
+				logrus.Error(err)
+				break
+			}
+			n, err = common.WritePackedPacket(writer, buf[:n])
+			if err != nil {
+				logrus.Error("Error in server connection write")
+				logrus.Error(err)
+				break
+			}
+		}
+		logrus.Info("Ending TCP writer for conn ", conn.RemoteAddr().String())
+		conn.Close()
+	}()
 
 	for {
 		logrus.Info("Ready for new connection")
 
-		conn, err := listener.Accept()
+		conn, err = listener.Accept()
 		logrus.Info("Accepted new client ", conn.RemoteAddr().String())
 		if err != nil {
 			logrus.Fatal(err)
 		}
 		reader := bufio.NewReader(conn)
-		writer := bufio.NewWriter(conn)
+		writer = bufio.NewWriter(conn)
 	
-		go func() {
-			buf := make([]byte, 1500)
-
-			for {
-				n, err := ifce.Read(buf)
-				if err != nil {
-					logrus.Error("Error in server interface read")
-					logrus.Error(err)
-					break
-				}
-				n, err = common.WritePackedPacket(writer, buf[:n])
-				if err != nil {
-					logrus.Error("Error in server connection write")
-					logrus.Error(err)
-					break
-				}
-			}
-			logrus.Info("Ending TCP writer for conn ", conn.RemoteAddr().String())
-			conn.Close()
-		}()
 
 		buf := make([]byte, 1500)
 		for {

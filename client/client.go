@@ -70,15 +70,16 @@ func StartClient(serverIP string) {
 
 			if err != nil {
 				logrus.Error("Error in client connection read")
+				logrus.Error(err)
 				cleanup()
-				logrus.Fatal(err)
 			}
 			logrus.Debug("Received packet from server of size ", n)
 			n, err = ifce.Write(buf[:n])
 			if err != nil {
 				logrus.Error("Error in client interface write")
+				logrus.Error(err)
+
 				cleanup()
-				logrus.Fatal(err)
 			}
 		}
 	}()
