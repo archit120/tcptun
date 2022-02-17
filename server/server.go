@@ -36,7 +36,7 @@ func StartServer(port int) {
 	logrus.Info(cmd)
 	defer ifce.Close()
 	var conn net.Conn
-	var writer *bufio.Writer
+	var writer io.Writer
 	go func() {
 		buf := make([]byte, 1500)
 		logrus.Info("Server redirector on")
@@ -68,7 +68,7 @@ func StartServer(port int) {
 			logrus.Fatal(err)
 		}
 		reader := bufio.NewReader(conn)
-		writer = bufio.NewWriter(conn)
+		writer = io.Writer(conn)
 	
 
 		buf := make([]byte, 1500)

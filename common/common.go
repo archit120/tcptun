@@ -24,12 +24,18 @@ func ReadPackedPacket(reader *bufio.Reader, buffer []byte) (int, error) {
 	if err!= nil{
 		return 0, err
 	}
+	if n!= int(size) {
+		return 0, errors.New("Incomplete data")
+	}
 	return n, err
 }
 
-func WritePackedPacket(writer *bufio.Writer, buffer []byte) (int, error) {
+func WritePackedPacket(writer io.Writer, buffer []byte) (int, error) {
 	sizebuff := make([]byte, 2)
 	binary.BigEndian.PutUint16(sizebuff, uint16(len(buffer)))
+	if len(buffer) > 1500 {
+		logrus.Error(len(buffer))
+	}
 	// log.Printf("Size is %d %x", len(buffer), sizebuff)
 	n, err := writer.Write(sizebuff)
 	if err!= nil {
@@ -43,6 +49,5 @@ func WritePackedPacket(writer *bufio.Writer, buffer []byte) (int, error) {
 	} else if n != len(buffer) {
 		return 0, errors.New("Didnt send enough bytes")
 	}
-	err = writer.Flush()
 	return n, err
 }

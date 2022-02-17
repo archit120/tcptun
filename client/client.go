@@ -2,6 +2,7 @@ package client
 
 import (
 	"bufio"
+	"io"
 	"net"
 	"os"
 	"os/exec"
@@ -61,7 +62,7 @@ func StartClient(serverIP string) {
 	}
 	logrus.Info("Script 1 done")
 	reader := bufio.NewReader(conn)
-	writer := bufio.NewWriter(conn)
+	writer := io.Writer(conn)
 
 	go func() {
 		buf := make([]byte, 1500)
