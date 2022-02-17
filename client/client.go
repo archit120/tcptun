@@ -18,6 +18,12 @@ import (
 
 func StartClient(serverIP string) {
 		// Create TCP connection to server
+	logrus.Info("Running initial script")
+	cmd, err := exec.Command("./scripts/client_p0.sh", strings.Split(serverIP, ":")[0]).Output()
+	if err != nil {
+		logrus.Info(string(cmd))
+		logrus.Fatal(err)
+	}
 
 	conn, err := net.Dial("tcp", serverIP)
 	if err != nil {
@@ -53,7 +59,7 @@ func StartClient(serverIP string) {
 	// execute ip commands to activate the interface and setup routes
 	if runtime.GOOS != "windows" {
 		logrus.Info("Running config script", ifce.Name())
-		cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name()).Output()
+		cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
 		if err != nil {
 			logrus.Info(string(cmd))
 			cleanup()

@@ -1,6 +1,7 @@
 # tcptun
 
-The goal of this project is to create a simple internet tunnel to bypass firewalls that only allow traffic on TCP port 443. Uses DHCP
+tcptun is a Layer 2 centralized routing protocol along with implementation in Go.
+
 
 Handhshake protocol - 
 
