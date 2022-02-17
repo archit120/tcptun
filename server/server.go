@@ -37,8 +37,10 @@ func StartServer(port int) {
 	defer ifce.Close()
 
 	for {
+		logrus.Info("Ready for new connection")
+
 		conn, err := listener.Accept()
-		logrus.Info("Accepted new client ", conn)
+		logrus.Info("Accepted new client ", conn.RemoteAddr().String())
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -62,7 +64,7 @@ func StartServer(port int) {
 					break
 				}
 			}
-			logrus.Info("Ending TCP writer for conn ", conn)
+			logrus.Info("Ending TCP writer for conn ", conn.RemoteAddr().String())
 			conn.Close()
 		}()
 
@@ -80,6 +82,7 @@ func StartServer(port int) {
 			ifce.Write(buf[:n])
 		}
 		conn.Close()
+
 	}
 
 
