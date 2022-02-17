@@ -7,4 +7,4 @@ else
     GW=$(getent hosts $1 | awk 'NR==1{ print $1 }')
 fi
 ip route del $GW
-ip link set dev $2 down
+ip link delete $2

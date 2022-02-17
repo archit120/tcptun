@@ -38,6 +38,7 @@ func StartServer(port int) {
 
 	for {
 		conn, err := listener.Accept()
+		logrus.Info("Accepted new client ", conn)
 		if err != nil {
 			logrus.Fatal(err)
 		}
@@ -61,7 +62,7 @@ func StartServer(port int) {
 					break
 				}
 			}
-
+			logrus.Info("Ending TCP writer for conn ", conn)
 			conn.Close()
 		}()
 
