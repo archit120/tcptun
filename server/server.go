@@ -39,23 +39,23 @@ func StartServer(port int) {
 	var writer *bufio.Writer
 	go func() {
 		buf := make([]byte, 1500)
-
-		for {
+		logrus.Info("Server redirector on")
+		for {	
 			n, err := ifce.Read(buf)
 			if err != nil {
 				logrus.Error("Error in server interface read")
 				logrus.Error(err)
-				break
+				continue
 			}
-			n, err = common.WritePackedPacket(writer, buf[:n])
-			if err != nil {
-				logrus.Error("Error in server connection write")
-				logrus.Error(err)
-				break
+			if writer != nil {
+				n, err = common.WritePackedPacket(writer, buf[:n])
+				if err != nil {
+					logrus.Error("Error in server connection write")
+					logrus.Error(err)
+					continue
+				}
 			}
 		}
-		logrus.Info("Ending TCP writer for conn ", conn.RemoteAddr().String())
-		conn.Close()
 	}()
 
 	for {
