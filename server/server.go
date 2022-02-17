@@ -47,6 +47,7 @@ func StartServer(port int) {
 				logrus.Error(err)
 				continue
 			}
+			// possible race buts its okayy
 			if writer != nil {
 				n, err = common.WritePackedPacket(writer, buf[:n])
 				if err != nil {
@@ -76,6 +77,8 @@ func StartServer(port int) {
 			if err != nil {
 				if err != io.EOF {
 					logrus.Error(err)
+				} else {
+					logrus.Info("Client ended connection")
 				}
 				break
 			}
@@ -84,6 +87,7 @@ func StartServer(port int) {
 			ifce.Write(buf[:n])
 		}
 		conn.Close()
+		writer = nil
 
 	}
 
