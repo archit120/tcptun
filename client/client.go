@@ -19,12 +19,18 @@ import (
 func StartClient(serverIP string) {
 		// Create TCP connection to server
 	logrus.Info("Running initial script")
-	cmd, err := exec.Command("./scripts/client_p0.sh", strings.Split(serverIP, ":")[0]).Output()
+	var err error = nil
+	var cmd []byte
+	if runtime.GOOS != "windows" {
+		cmd, err = exec.Command("./scripts/client_p0.sh", strings.Split(serverIP, ":")[0]).Output()
+	} else {
+		cmd, err = exec.Command("powershell", "./scripts/client_windows.ps1", strings.Split(serverIP, ":")[0]).Output()
+	}
 	if err != nil {
 		logrus.Info(string(cmd))
 		logrus.Fatal(err)
 	}
-
+	logrus.Info(string(cmd))
 	conn, err := net.Dial("tcp", serverIP)
 	if err != nil {
 		logrus.Fatal(err)
@@ -42,20 +48,25 @@ func StartClient(serverIP string) {
 
 	defer ifce.Close()
 	cleanup := func() {
+		logrus.Info("Cleanup called")
 		conn.Close()
 		ifce.Close()
 		exec.Command("./scripts/client_cleanup.sh", strings.Split(serverIP, ":")[0], ifce.Name()).Output()
 	}
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup()
-		os.Exit(0)
-	}()
+	if runtime.GOOS != "windows" {
+		c := make(chan os.Signal)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		go func() {
+			<-c
+			cleanup()
+			os.Exit(0)
+		}()
+	
+	}
 
-	defer conn.Close()
+	logrus.Info(ifce.Name())
+	// defer conn.Close()
 	// execute ip commands to activate the interface and setup routes
 	reader := bufio.NewReader(conn)
 	writer := io.Writer(conn)
@@ -75,30 +86,30 @@ func StartClient(serverIP string) {
 			if err != nil {
 				logrus.Error("Error in client interface write")
 				logrus.Error(err)
-
+				logrus.Printf("%T\n", err)
 				cleanup()
 			}
 		}
 	}()
 
 	go func() {
-		var err error
+		var err error = nil
 		var cmd []byte
-		if runtime.GOOS != "windows" {
-			logrus.Info("Running config script", ifce.Name())
-			cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
-			if err != nil {
-				logrus.Info(string(cmd))
-				cleanup()
-				logrus.Fatal(err)
-			}
-		}
+		// if runtime.GOOS != "windows" {
+		// 	logrus.Info("Running config script", ifce.Name())
+		// 	cmd, err := exec.Command("./scripts/client_p1.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+		// 	if err != nil {
+		// 		logrus.Info(string(cmd))
+		// 		cleanup()
+		// 		logrus.Fatal(err)
+		// 	}
+		// }
 		logrus.Info("Script 1 done")
 	
 		if runtime.GOOS != "windows" {
 			cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
 		} else {
-			cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+			// cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
 		}
 		if err != nil {
 			logrus.Info(string(cmd))
@@ -114,8 +125,13 @@ func StartClient(serverIP string) {
 		n, err := ifce.Read(packet)
 		logrus.Debug("Received packet of size %d sending to conn.\n", n)
 		if err != nil {
-			cleanup()
-			logrus.Fatal(err)
+			if err.Error() == "More data is available." {
+				// logrus.Warn(err)
+			} else {
+				logrus.Error(err)
+				cleanup()
+				logrus.Fatal(err)
+			}
 		}
 		common.WritePackedPacket(writer, packet[:n])
 	}

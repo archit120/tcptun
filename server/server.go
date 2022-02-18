@@ -51,9 +51,9 @@ func StartServer(port int) {
 			if writer != nil {
 				n, err = common.WritePackedPacket(writer, buf[:n])
 				if err != nil {
-					logrus.Error("Error in server connection write")
-					logrus.Error(err)
-					continue
+					logrus.Warn("Error in server connection write")
+					logrus.Warn(err)
+					// continue
 				}
 			}
 		}
