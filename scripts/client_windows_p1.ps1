@@ -1,5 +1,7 @@
-$x = route PRINT | Select-String -Pattern "\s*0\.0\.0\.0\s*0\.0\.0\.0\s*([\d\.]*)"
-$x -match "\s*0\.0\.0\.0\s*0\.0\.0\.0\s*([\d\.]*)"
-$a = $Matches.1
+$y = $args[0]
+$x =  netsh interface ip show interfaces | Select-String -Pattern "^\s*(\d*).+$y$"
+$interface_num = $x.Matches.groups[1].value
 $ip = [System.Net.Dns]::GetHostAddresses($args[0])[0].IPAddressToString
-route add $ip mask 255.255.255.255 $a
+route add 0.0.0.0 mask 128.0.0.0 $ip if $interface_num
+route add 128.0.0.0 mask 128.0.0.0 $ip if $interface_num
+netsh interface ipv4 set subinterface "$y" mtu=1400

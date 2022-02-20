@@ -109,13 +109,14 @@ func StartClient(serverIP string) {
 		if runtime.GOOS != "windows" {
 			cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
 		} else {
-			// cmd, err = exec.Command("./scripts/client_p2.sh", ifce.Name(), strings.Split(serverIP, ":")[0]).Output()
+			cmd, err = exec.Command("powershell", "./scripts/client_windows_p1.ps1", "\""+ifce.Name() +"\"", strings.Split(serverIP, ":")[0]).Output()
 		}
 		if err != nil {
 			logrus.Info(string(cmd))
 			cleanup()
 			logrus.Fatal(err)
 		}
+		logrus.Info(string(cmd))
 
 		logrus.Info("Script 2 done")
 	}()
@@ -126,7 +127,7 @@ func StartClient(serverIP string) {
 		logrus.Debug("Received packet of size %d sending to conn.\n", n)
 		if err != nil {
 			if err.Error() == "More data is available." {
-				// logrus.Warn(err)
+				logrus.Warn(err)
 			} else {
 				logrus.Error(err)
 				cleanup()
